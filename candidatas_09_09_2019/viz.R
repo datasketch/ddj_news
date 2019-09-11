@@ -2,6 +2,11 @@ library(tidyverse)
 library(hgchmagic)
 
 data <- read_csv('data/candidatas.csv')
+data$DEPARTAMENTO <- gsub('Ã‘', 'Ñ', data$DEPARTAMENTO)
+data$PARTIDO <- gsub('Ã“', 'Ó', data$PARTIDO)
+data$PARTIDO <- gsub('Ã‰', 'É', data$PARTIDO)
+
+
 data$GENERO <- plyr::revalue(data$GENERO, c('F' = 'Femenino', 'M' = 'Masculino'))
 
 territorial <- data %>% 
@@ -16,10 +21,11 @@ genero <- territorial %>%
 
 
 opts <- list(
+            title = 'Porcentaje de candidatas y candidatos para autoridades territoriales en Colombia',
              nDigits = 2,
              suffix = '%',
              agg_text = ' ',
-             colors = c( "#BDCAD1", "#53255E")
+             colors = c("#53255E", "#BDCAD1")
 )
 v1 <- hgch_pie_CatNum(genero, opts = opts)
 htmlwidgets::saveWidget(v1, 'genero_territorial.html')
@@ -47,14 +53,15 @@ top_fem <- par_fem %>%
               select(GENERO, MUNICIPIO, porcentaje)
             
 opts <- list(
-  agg_text = ' ',
-  graph_type = "stacked",
-  suffix = '%',
-  colors = c( "#BDCAD1", "#53255E"),
-  verLabel = ' ',
-  horLabel = ' ',
-  order2 = c('AGUAZUL', 'CASABIANCA', 'SOCORRO')
-)
+             title = 'Los 10 municipios con más participación femenina para las alcaldías',
+             agg_text = ' ',
+             graph_type = "stacked",
+             suffix = '%',
+             colors = c("#BDCAD1", "#53255E"),
+             verLabel = ' ',
+             horLabel = ' ',
+             order2 = c('AGUAZUL', 'CASABIANCA', 'SOCORRO')
+          )
 v2 <- hgch_bar_CatCatNum(top_fem, opts = opts) %>% 
        hc_yAxis(max = 100)
 htmlwidgets::saveWidget(v2, 'genero_alcaldia.html')
@@ -72,13 +79,14 @@ deptos <- gobernacion %>%
              arrange(-Total)
 
 opts <- list(
-  agg_text = ' ',
-  graph_type = "stacked",
-  colors = c( "#BDCAD1", "#53255E"),
-  verLabel = ' ',
-  horLabel = ' ',
-  orientation = 'hor'
-)
+            title = 'Número de candidatos y candidatas a la gobernación por departamentos de Colombia',
+            agg_text = ' ',
+            graph_type = "stacked",
+            colors = c("#BDCAD1", "#53255E"),
+            verLabel = ' ',
+            horLabel = ' ',
+            orientation = 'hor'
+           )
 v3 <- hgch_bar_CatCatNum(deptos, opts = opts)
 htmlwidgets::saveWidget(v3, 'genero_gobernador.html')
 
@@ -86,13 +94,13 @@ htmlwidgets::saveWidget(v3, 'genero_gobernador.html')
 # genero por partido en territoriales
 
 opts <- list(
-  agg_text = ' ',
-  graph_type = "stacked",
-  suffix = '%',
-  colors = c( "#BDCAD1", "#53255E"),
-  verLabel = ' ',
-  horLabel = ' '
-)
+            agg_text = ' ',
+            graph_type = "stacked",
+            suffix = '%',
+            colors = c( "#BDCAD1", "#53255E"),
+            verLabel = ' ',
+            horLabel = ' '
+           )
 
 asamblea <- data %>% 
              filter(CORPORACION_CARGO == 'ASAMBLEA',
@@ -115,17 +123,19 @@ top_fem <- par_fem %>%
                select(GENERO, PARTIDO, porcentaje)
 
 opts <- list(
-  agg_text = ' ',
-  graph_type = "stacked",
-  suffix = '%',
-  colors = c( "#53255E", "#BDCAD1"),
-  verLabel = ' ',
-  horLabel = ' ',
-  order1 = c('FEMENINO', 'MASCULINO'),
-  order2 = unique(top_fem$PARTIDO),
-  orientation = 'hor',
-  labelWrapV = c(100, 100)
-)
+             title = 'Porcentaje de participación por género según partido político con personería jurídica en Asamblea',
+             agg_text = ' ',
+             nDigits = 1,
+             graph_type = "stacked",
+             suffix = '%',
+             colors = c( "#BDCAD1", "#53255E"),
+             verLabel = ' ',
+             horLabel = ' ',
+             order1 = c('FEMENINO', 'MASCULINO'),
+             order2 = unique(top_fem$PARTIDO),
+             orientation = 'hor',
+             labelWrapV = c(100, 100)
+           )
 v4 <- hgch_bar_CatCatNum(top_fem, opts = opts) %>% 
        hc_yAxis(max = 100)
 htmlwidgets::saveWidget(v4, 'genero_asamblea_juridica.html')
